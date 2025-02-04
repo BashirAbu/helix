@@ -2342,15 +2342,29 @@ fn run_shell_command(
     if event != PromptEvent::Validate {
         return Ok(());
     }
+    
+    let (view, doc) = current!(cx.editor);
+    let line_num = cx.editor.cursor_cache.get(view, doc);
+
     let shell = cx.editor.config().shell.clone();
 
-    let file_name = doc!(cx.editor).path().unwrap().clone();
-    let (view, doc) = current!(cx.editor);
-    let mut line_num = cx.editor.cursor_cache.get(view, doc).unwrap().clone();
-    line_num.row += 1;
+    let file_name = doc!(cx.editor).clone();
+    let file_name_str = match file_name.path() {
+        Some(path) => match path.to_str() {
+            Some(name) => name.clone(),
+            None => "no path",
+        },
+        None => "no path"
+    };
+    //line_num.row += 1;
     let args = args.join(" ");
-    let  replaced = args.replace("{file}", file_name.to_str().unwrap());
-    let  replaced = replaced.replace("{line}", line_num.row.to_string().as_str());
+    let replaced = args.replace("{file}", file_name_str);
+    let line_number = match line_num {
+        Some(line) => line.row + 1,
+        None => 0
+    };
+
+    let  replaced = replaced.replace("{line}", line_number.to_string().as_str());
     let args = replaced;
 
     let callback = async move {
