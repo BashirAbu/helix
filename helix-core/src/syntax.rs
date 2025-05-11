@@ -334,6 +334,7 @@ pub enum LanguageServerFeature {
     Diagnostics,
     RenameSymbol,
     InlayHints,
+    DocumentColors,
 }
 
 impl Display for LanguageServerFeature {
@@ -357,6 +358,7 @@ impl Display for LanguageServerFeature {
             Diagnostics => "diagnostics",
             RenameSymbol => "rename-symbol",
             InlayHints => "inlay-hints",
+            DocumentColors => "document-colors",
         };
         write!(f, "{feature}",)
     }
@@ -756,7 +758,7 @@ impl LanguageConfiguration {
             let language = get_language(self.grammar.as_deref().unwrap_or(&self.language_id))
                 .map_err(|err| {
                     log::error!(
-                        "Failed to load tree-sitter parser for language {:?}: {}",
+                        "Failed to load tree-sitter parser for language {:?}: {:#}",
                         self.language_id,
                         err
                     )
